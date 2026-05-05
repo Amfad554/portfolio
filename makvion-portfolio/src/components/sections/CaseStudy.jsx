@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
 import {
     ArrowUpRight, Database, Shield, GitBranch,
-    Layers, CheckCircle2, AlertTriangle, Lightbulb, Server
+    Layers, CheckCircle2, AlertTriangle, Lightbulb,
+    Server, Zap, CreditCard, Image
 } from 'lucide-react'
 import Container from '../layout/Container'
 import SectionLabel from '../ui/SectionLabel'
@@ -11,68 +12,48 @@ import { featuredProject } from '../../data/projects'
 
 const p = featuredProject
 
-/* ── Flow steps — how WorkDone works end to end ── */
 const flowSteps = [
     {
         step: '01',
-        title: 'Register & Select Role',
-        desc: 'User signs up and chooses a role — Client or Freelancer. Role is persisted in the database and drives all downstream access control.',
+        title: 'Register & Verify',
+        desc: 'User signs up with email and password. JWT access + refresh tokens are issued. Optional blue-tick verification unlocks full posting privileges.',
     },
     {
         step: '02',
-        title: 'Client Posts a Job',
-        desc: 'Authenticated clients create job listings with title, description, budget, and category. Stored in the jobs table with a foreign key to the client.',
+        title: 'Build Your Profile',
+        desc: 'Users set up a profile with Cloudinary-hosted avatar, bio, and preferences. Profile data feeds into all seven systems.',
     },
     {
         step: '03',
-        title: 'Freelancer Submits Proposal',
-        desc: 'Freelancers browse open jobs and submit proposals with cover letter and rate. Proposals are linked to both job and freelancer via relational keys.',
+        title: 'Post or Browse',
+        desc: 'Post a product, job, or housing listing — or browse what others have posted. Each system has its own filtered feed.',
     },
     {
         step: '04',
-        title: 'Client Reviews & Accepts',
-        desc: 'Client sees all proposals on their dashboard. Accepting a proposal updates the job status and creates a contract record.',
+        title: 'Connect & Chat',
+        desc: 'Socket.IO powers real-time messaging between users. Notifications fire instantly for messages, applications, and interactions.',
     },
     {
         step: '05',
-        title: 'Work Delivery',
-        desc: 'Freelancer submits work. Client reviews and marks job complete. Contract state transitions are tracked in the database.',
+        title: 'Transact Securely',
+        desc: 'Paystack handles in-app payments. Users can receive payments, request withdrawals, and track transaction history.',
+    },
+    {
+        step: '06',
+        title: 'Engage Socially',
+        desc: 'The social feed shows posts, likes, and comments from followed users — keeping the community active beyond transactional use.',
     },
 ]
 
-/* ── Technical decisions & tradeoffs ── */
-const decisions = [
-    {
-        icon: AlertTriangle,
-        challenge: 'Role-based access without bloating middleware',
-        decision: 'Created a single reusable `authorizeRole(...roles)` middleware factory. Clean, composable, and easy to extend as new roles are added.',
-    },
-    {
-        icon: Database,
-        challenge: 'Designing a normalized schema for proposals + contracts',
-        decision: 'Separated jobs, proposals, and contracts into distinct tables with foreign keys. Avoids data duplication and makes state transitions explicit.',
-    },
-    {
-        icon: Shield,
-        challenge: 'Secure auth without third-party services',
-        decision: 'Implemented JWT with httpOnly cookies + bcrypt password hashing. No OAuth dependency — full ownership of the auth layer.',
-    },
-    {
-        icon: Lightbulb,
-        challenge: 'Keeping the API predictable across all endpoints',
-        decision: 'Standardized all responses as `{ success, data, message }`. Every controller follows the same shape — easy to consume on the frontend.',
-    },
-]
-
-/* ── Database table overview ── */
 const tables = [
-    { name: 'users', cols: ['id', 'name', 'email', 'password_hash', 'role', 'created_at'] },
-    { name: 'jobs', cols: ['id', 'client_id', 'title', 'description', 'budget', 'status'] },
-    { name: 'proposals', cols: ['id', 'job_id', 'freelancer_id', 'cover_letter', 'rate', 'status'] },
-    { name: 'contracts', cols: ['id', 'job_id', 'freelancer_id', 'client_id', 'state', 'created_at'] },
+    { name: 'users', cols: ['id', 'name', 'email', 'password_hash', 'role', 'verified', 'avatar_url', 'created_at'] },
+    { name: 'listings', cols: ['id', 'user_id', 'type', 'title', 'description', 'price', 'media_urls', 'status'] },
+    { name: 'jobs', cols: ['id', 'poster_id', 'title', 'description', 'budget', 'status', 'created_at'] },
+    { name: 'applications', cols: ['id', 'job_id', 'applicant_id', 'cover_letter', 'status'] },
+    { name: 'messages', cols: ['id', 'sender_id', 'receiver_id', 'content', 'read', 'created_at'] },
+    { name: 'transactions', cols: ['id', 'user_id', 'amount', 'type', 'reference', 'status'] },
 ]
 
-/* ── Reusable section sub-header ── */
 function SubHeader({ children }) {
     return (
         <h3 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] tracking-tight mb-8">
@@ -86,12 +67,12 @@ function CaseStudy() {
         <section id="workdone-case-study" className="py-24 md:py-32 bg-white border-t border-black/5">
             <Container narrow>
 
-                {/* ── Header ── */}
+                {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 24 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ duration: 0.55 }}
                     className="mb-16"
                 >
                     <SectionLabel>Case Study</SectionLabel>
@@ -99,15 +80,29 @@ function CaseStudy() {
                         WorkDone
                     </h2>
                     <p className="text-lg text-[#1A1A1A]/50 leading-relaxed max-w-xl">
-                        A deep dive into the architecture, decisions, and complexity behind
-                        building a full-stack freelance platform from scratch.
+                        A deep dive into building a unified student platform — architecture,
+                        decisions, real-time systems, and payment integration.
                     </p>
                 </motion.div>
 
-                {/* ── Divider ── */}
                 <div className="w-full h-px bg-black/5 mb-16" />
 
-                {/* ── 1. Overview ── */}
+                {/* ── CASE STUDY SCREENSHOT PLACEHOLDER ── */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="mb-16 w-full h-72 rounded-2xl border border-black/5 overflow-hidden bg-[#0F4C5C]/4"
+                >
+                    <img
+                        src="/workdone-preview.png"
+                        alt="WorkDone dashboard"
+                        className="w-full h-full object-cover object-top"
+                    />
+                </motion.div>
+
+                {/* 1. Overview */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -116,33 +111,30 @@ function CaseStudy() {
                     className="mb-16"
                 >
                     <SubHeader>01 — Project Overview</SubHeader>
-                    <p className="text-[#1A1A1A]/60 leading-relaxed mb-6">
-                        WorkDone is a production-minded freelance and work management platform.
-                        It handles the full lifecycle of freelance work — from job posting and
-                        proposal submission through to contract creation and work delivery.
-                        Every feature is backed by real backend logic, a normalized database,
-                        and protected API endpoints.
+                    <p className="text-[#1A1A1A]/60 leading-relaxed mb-8">
+                        WorkDone is a unified student platform built to replace the fragmented
+                        ecosystem students rely on today. Instead of switching between Facebook
+                        Marketplace, LinkedIn, WhatsApp groups, and housing apps — WorkDone
+                        brings everything into one trusted, verified environment built
+                        specifically for student life.
                     </p>
 
-                    {/* Meta grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
                             { label: 'Role', value: 'Full-Stack Dev' },
-                            { label: 'Stack', value: 'PERN' },
-                            { label: 'Type', value: 'Platform / SaaS' },
+                            { label: 'Stack', value: 'PERN + Socket.IO' },
+                            { label: 'Type', value: 'Student Platform' },
                             { label: 'Status', value: 'In Development' },
                         ].map(({ label, value }) => (
                             <div key={label} className="bg-[#F5F7F6] rounded-lg p-4 border border-black/5">
-                                <div className="text-[10px] uppercase tracking-widest font-semibold text-[#1A1A1A]/35 mb-1">
-                                    {label}
-                                </div>
+                                <div className="text-[10px] uppercase tracking-widest font-semibold text-[#1A1A1A]/35 mb-1">{label}</div>
                                 <div className="text-sm font-semibold text-[#0F4C5C]">{value}</div>
                             </div>
                         ))}
                     </div>
                 </motion.div>
 
-                {/* ── 2. Problem & Solution ── */}
+                {/* 2. Problem & Solution */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -153,25 +145,11 @@ function CaseStudy() {
                     <SubHeader>02 — Problem & Solution</SubHeader>
                     <div className="grid sm:grid-cols-2 gap-6">
                         {[
-                            {
-                                heading: 'The Problem',
-                                color: '#E36414',
-                                body: p.problem,
-                            },
-                            {
-                                heading: 'The Solution',
-                                color: '#0F4C5C',
-                                body: p.solution,
-                            },
+                            { heading: 'The Problem', color: '#E36414', body: p.problem },
+                            { heading: 'The Solution', color: '#0F4C5C', body: p.solution },
                         ].map(({ heading, color, body }) => (
-                            <div
-                                key={heading}
-                                className="bg-[#F5F7F6] rounded-xl p-6 border border-black/5"
-                            >
-                                <div
-                                    className="text-xs font-semibold uppercase tracking-widest mb-3"
-                                    style={{ color }}
-                                >
+                            <div key={heading} className="bg-[#F5F7F6] rounded-xl p-6 border border-black/5">
+                                <div className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color }}>
                                     {heading}
                                 </div>
                                 <p className="text-sm text-[#1A1A1A]/60 leading-relaxed">{body}</p>
@@ -180,7 +158,7 @@ function CaseStudy() {
                     </div>
                 </motion.div>
 
-                {/* ── 3. How It Works ── */}
+                {/* 3. Core Systems */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -188,8 +166,45 @@ function CaseStudy() {
                     transition={{ duration: 0.5 }}
                     className="mb-16"
                 >
-                    <SubHeader>03 — How It Works</SubHeader>
-                    <div className="space-y-4">
+                    <SubHeader>03 — Core Systems</SubHeader>
+                    <p className="text-sm text-[#1A1A1A]/50 leading-relaxed mb-8">
+                        Seven interconnected systems — each with its own data layer, API routes,
+                        and UI — unified under one authentication context.
+                    </p>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                        {p.systems.map(({ name, desc }, i) => (
+                            <motion.div
+                                key={name}
+                                initial={{ opacity: 0, y: 12 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.4, delay: i * 0.07 }}
+                                className="flex gap-4 p-5 bg-[#F5F7F6] rounded-xl border border-black/5 group hover:border-[#0F4C5C]/20 transition-colors"
+                            >
+                                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#0F4C5C]/8 flex items-center justify-center group-hover:bg-[#0F4C5C] transition-colors duration-200">
+                                    <span className="text-[10px] font-bold text-[#0F4C5C] group-hover:text-white transition-colors">
+                                        {String(i + 1).padStart(2, '0')}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div className="text-sm font-semibold text-[#1A1A1A] mb-1">{name}</div>
+                                    <p className="text-xs text-[#1A1A1A]/50 leading-relaxed">{desc}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* 4. How It Works */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="mb-16"
+                >
+                    <SubHeader>04 — How It Works</SubHeader>
+                    <div className="space-y-3">
                         {flowSteps.map(({ step, title, desc }, i) => (
                             <motion.div
                                 key={step}
@@ -199,7 +214,6 @@ function CaseStudy() {
                                 transition={{ duration: 0.4, delay: i * 0.07 }}
                                 className="flex gap-5 p-5 bg-[#F5F7F6] rounded-xl border border-black/5 group hover:border-[#0F4C5C]/20 transition-colors"
                             >
-                                {/* Step number */}
                                 <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-[#0F4C5C]/8 flex items-center justify-center group-hover:bg-[#0F4C5C] transition-colors duration-200">
                                     <span className="text-[11px] font-bold text-[#0F4C5C] group-hover:text-white transition-colors duration-200">
                                         {step}
@@ -214,7 +228,7 @@ function CaseStudy() {
                     </div>
                 </motion.div>
 
-                {/* ── 4. Database Schema ── */}
+                {/* 5. Database Schema */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -222,12 +236,11 @@ function CaseStudy() {
                     transition={{ duration: 0.5 }}
                     className="mb-16"
                 >
-                    <SubHeader>04 — Database Schema</SubHeader>
+                    <SubHeader>05 — Database Schema</SubHeader>
                     <p className="text-sm text-[#1A1A1A]/50 leading-relaxed mb-8">
-                        PostgreSQL with a normalized relational design. Four core tables —
-                        each with a clear responsibility and clean foreign key relationships.
+                        PostgreSQL with a normalized relational design. Six core tables
+                        with clean foreign key relationships across all seven systems.
                     </p>
-
                     <div className="grid sm:grid-cols-2 gap-4">
                         {tables.map(({ name, cols }, i) => (
                             <motion.div
@@ -235,15 +248,13 @@ function CaseStudy() {
                                 initial={{ opacity: 0, y: 12 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: i * 0.08 }}
+                                transition={{ duration: 0.4, delay: i * 0.07 }}
                                 className="bg-[#F5F7F6] rounded-xl border border-black/5 overflow-hidden"
                             >
-                                {/* Table header */}
                                 <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-black/5 bg-[#0F4C5C]/4">
                                     <Database size={12} className="text-[#0F4C5C]" />
                                     <span className="text-xs font-bold text-[#0F4C5C] font-mono">{name}</span>
                                 </div>
-                                {/* Columns */}
                                 <div className="px-5 py-4 space-y-1.5">
                                     {cols.map((col) => (
                                         <div key={col} className="flex items-center gap-2">
@@ -257,7 +268,7 @@ function CaseStudy() {
                     </div>
                 </motion.div>
 
-                {/* ── 5. Tech Architecture ── */}
+                {/* 6. Technical Architecture */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -265,48 +276,31 @@ function CaseStudy() {
                     transition={{ duration: 0.5 }}
                     className="mb-16"
                 >
-                    <SubHeader>05 — Technical Architecture</SubHeader>
-
+                    <SubHeader>06 — Technical Architecture</SubHeader>
                     <div className="grid sm:grid-cols-2 gap-6">
-                        {/* Frontend */}
-                        <div className="bg-[#F5F7F6] rounded-xl p-6 border border-black/5">
-                            <div className="flex items-center gap-2 mb-5">
-                                <Layers size={14} className="text-[#0F4C5C]" />
-                                <span className="text-xs font-semibold uppercase tracking-widest text-[#0F4C5C]">
-                                    Frontend
-                                </span>
+                        {[
+                            { label: 'Frontend', icon: Layers, items: p.architecture.frontend },
+                            { label: 'Backend', icon: Server, items: p.architecture.backend },
+                        ].map(({ label, icon: Icon, items }) => (
+                            <div key={label} className="bg-[#F5F7F6] rounded-xl p-6 border border-black/5">
+                                <div className="flex items-center gap-2 mb-5">
+                                    <Icon size={14} className="text-[#0F4C5C]" />
+                                    <span className="text-xs font-semibold uppercase tracking-widest text-[#0F4C5C]">{label}</span>
+                                </div>
+                                <ul className="space-y-3">
+                                    {items.map((item) => (
+                                        <li key={item} className="flex items-center gap-3">
+                                            <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
+                                            <span className="text-sm text-[#1A1A1A]/65">{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
                             </div>
-                            <ul className="space-y-3">
-                                {p.architecture.frontend.map((item) => (
-                                    <li key={item} className="flex items-center gap-3">
-                                        <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
-                                        <span className="text-sm text-[#1A1A1A]/65">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Backend */}
-                        <div className="bg-[#F5F7F6] rounded-xl p-6 border border-black/5">
-                            <div className="flex items-center gap-2 mb-5">
-                                <Server size={14} className="text-[#0F4C5C]" />
-                                <span className="text-xs font-semibold uppercase tracking-widest text-[#0F4C5C]">
-                                    Backend
-                                </span>
-                            </div>
-                            <ul className="space-y-3">
-                                {p.architecture.backend.map((item) => (
-                                    <li key={item} className="flex items-center gap-3">
-                                        <CheckCircle2 size={12} className="text-emerald-500 flex-shrink-0" />
-                                        <span className="text-sm text-[#1A1A1A]/65">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                        ))}
                     </div>
                 </motion.div>
 
-                {/* ── 6. Challenges & Decisions ── */}
+                {/* 7. Challenges & Decisions */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -314,9 +308,9 @@ function CaseStudy() {
                     transition={{ duration: 0.5 }}
                     className="mb-16"
                 >
-                    <SubHeader>06 — Challenges & Decisions</SubHeader>
+                    <SubHeader>07 — Challenges & Decisions</SubHeader>
                     <div className="space-y-4">
-                        {decisions.map(({ icon: Icon, challenge, decision }, i) => (
+                        {p.decisions.map(({ challenge, decision }, i) => (
                             <motion.div
                                 key={challenge}
                                 initial={{ opacity: 0, y: 12 }}
@@ -327,17 +321,13 @@ function CaseStudy() {
                             >
                                 <div>
                                     <div className="w-8 h-8 rounded-lg bg-[#E36414]/10 flex items-center justify-center mb-3">
-                                        <Icon size={14} className="text-[#E36414]" />
+                                        <AlertTriangle size={14} className="text-[#E36414]" />
                                     </div>
-                                    <div className="text-xs font-semibold text-[#E36414] uppercase tracking-widest mb-1">
-                                        Challenge
-                                    </div>
+                                    <div className="text-xs font-semibold text-[#E36414] uppercase tracking-widest mb-1">Challenge</div>
                                     <p className="text-xs text-[#1A1A1A]/60 leading-relaxed">{challenge}</p>
                                 </div>
                                 <div className="sm:border-l sm:border-black/5 sm:pl-6">
-                                    <div className="text-xs font-semibold text-[#0F4C5C] uppercase tracking-widest mb-1">
-                                        Decision
-                                    </div>
+                                    <div className="text-xs font-semibold text-[#0F4C5C] uppercase tracking-widest mb-1">Decision</div>
                                     <p className="text-sm text-[#1A1A1A]/60 leading-relaxed">{decision}</p>
                                 </div>
                             </motion.div>
@@ -345,7 +335,7 @@ function CaseStudy() {
                     </div>
                 </motion.div>
 
-                {/* ── 7. Key Features ── */}
+                {/* 8. Key Highlights */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -353,7 +343,7 @@ function CaseStudy() {
                     transition={{ duration: 0.5 }}
                     className="mb-16"
                 >
-                    <SubHeader>07 — Key Features</SubHeader>
+                    <SubHeader>08 — Key Highlights</SubHeader>
                     <div className="grid sm:grid-cols-2 gap-3">
                         {p.highlights.map((h, i) => (
                             <motion.div
@@ -371,7 +361,7 @@ function CaseStudy() {
                     </div>
                 </motion.div>
 
-                {/* ── 8. Stack summary ── */}
+                {/* 9. Stack */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -379,15 +369,13 @@ function CaseStudy() {
                     transition={{ duration: 0.5 }}
                     className="mb-16"
                 >
-                    <SubHeader>08 — Stack</SubHeader>
+                    <SubHeader>09 — Stack</SubHeader>
                     <div className="flex flex-wrap gap-2">
-                        {p.stack.map((tech) => (
-                            <Tag key={tech}>{tech}</Tag>
-                        ))}
+                        {p.stack.map((tech) => <Tag key={tech}>{tech}</Tag>)}
                     </div>
                 </motion.div>
 
-                {/* ── 9. Links ── */}
+                {/* Links */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -397,10 +385,10 @@ function CaseStudy() {
                 >
                     <div className="flex flex-wrap gap-4 items-center justify-between">
                         <div>
-                            <div className="text-xs uppercase tracking-widest font-semibold text-[#1A1A1A]/30 mb-1">
+                            <div className="text-xs uppercase tracking-widest font-semibold text-[#1A1A1A]/30 mb-3">
                                 Project Links
                             </div>
-                            <div className="flex flex-wrap gap-3 mt-3">
+                            <div className="flex flex-wrap gap-3">
                                 {p.links.live ? (
                                     <Button as="a" href={p.links.live} target="_blank" rel="noreferrer">
                                         Live Site <ArrowUpRight size={13} />
@@ -411,20 +399,12 @@ function CaseStudy() {
                                     </span>
                                 )}
                                 {p.links.github && (
-                                    <Button
-                                        variant="outline"
-                                        as="a"
-                                        href={p.links.github}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                    >
+                                    <Button variant="outline" as="a" href={p.links.github} target="_blank" rel="noreferrer">
                                         GitHub <ArrowUpRight size={13} />
                                     </Button>
                                 )}
                             </div>
                         </div>
-
-                        {/* Back to top */}
                         <button
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                             className="text-xs text-[#1A1A1A]/30 hover:text-[#0F4C5C] font-medium transition-colors cursor-pointer"

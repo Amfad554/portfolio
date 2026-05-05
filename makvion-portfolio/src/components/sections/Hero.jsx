@@ -35,12 +35,26 @@ function Hero() {
                     {/* LEFT: Main copy */}
                     <motion.div variants={container} initial="hidden" animate="show">
 
-                        {/* Availability badge */}
-                        <motion.div variants={item} className="mb-8">
-                            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-black/8 rounded-full text-xs font-medium text-[#1A1A1A]/60 shadow-sm">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                Available for new projects
-                            </span>
+                        {/* Identity row — photo + name */}
+                        <motion.div variants={item} className="mb-8 flex items-center gap-4">
+                            <div className="relative flex-shrink-0">
+                                <img
+                                    src="/photo.jpg"
+                                    alt="Makvion-Tech"
+                                    className="w-14 h-14 rounded-full object-cover border-2 border-[#0F4C5C]/20"
+                                />
+                                {/* Online indicator */}
+                                <span className="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#F5F7F6]" />
+                            </div>
+                            <div>
+                                <div className="text-sm font-semibold text-[#1A1A1A]">Makvion-Tech</div>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                    <span className="text-xs text-[#1A1A1A]/40 font-medium">
+                                        Available for new projects
+                                    </span>
+                                </div>
+                            </div>
                         </motion.div>
 
                         {/* Headline */}
@@ -167,11 +181,12 @@ function Hero() {
                     </motion.div>
 
                 </div>
-            </Container>
+            </Container >
 
             {/* Scroll indicator */}
-            <motion.div
-                initial={{ opacity: 0 }}
+            <motion.div 
+                initial={{ opacity: 0 }
+                }
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.4, duration: 0.6 }}
                 className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5"
@@ -182,9 +197,9 @@ function Hero() {
                     transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
                     className="w-px h-6 bg-gradient-to-b from-[#0F4C5C]/30 to-transparent"
                 />
-            </motion.div>
+            </motion.div>      
 
-        </section>
+        </section >
     )
 }
 

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, ExternalLink } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import Container from '../layout/Container'
 import SectionLabel from '../ui/SectionLabel'
 import Tag from '../ui/Tag'
@@ -12,17 +12,25 @@ function ProjectCard({ project, index }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: index * 0.1 }}
-            className="group bg-white border border-black/6 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300"
+            className="bg-white border border-black/6 rounded-xl overflow-hidden hover:shadow-md transition-shadow duration-300 group"
         >
-            {/* Card top bar */}
-            <div
-                className="h-1.5 w-full"
-                style={{ backgroundColor: project.accent }}
-            />
+            {/* Accent bar */}
+            <div className="h-1 w-full" style={{ backgroundColor: project.accent }} />
 
+            {/* Project screenshot */}
+            <div className="w-full h-44 border-b border-black/5 overflow-hidden"
+                style={{ backgroundColor: project.accent + '08' }}
+            >
+                <img
+                    src={`/${project.id === 'apexcare' ? 'apexcare-preview' : project.id + '-preview'}.png`}
+                    alt={`${project.name} screenshot`}
+                    className="w-full h-full object-cover object-top"
+                />
+            </div>
             <div className="p-7">
+
                 {/* Header */}
-                <div className="flex items-start justify-between mb-5">
+                <div className="flex items-start justify-between mb-4">
                     <div>
                         <span className="text-[10px] uppercase tracking-[0.16em] font-semibold text-[#1A1A1A]/35 block mb-1.5">
                             {project.role}
@@ -30,57 +38,51 @@ function ProjectCard({ project, index }) {
                         <h3 className="text-xl font-bold text-[#1A1A1A] tracking-tight">
                             {project.name}
                         </h3>
+                        <p className="text-xs text-[#1A1A1A]/40 font-medium mt-0.5">{project.tagline}</p>
                     </div>
-
-                    {/* External link icon — appears on hover */}
                     {project.links.live && (
                         <a
                             href={project.links.live}
                             target="_blank"
                             rel="noreferrer"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 w-8 h-8 rounded-full border border-black/10 flex items-center justify-center hover:border-[#0F4C5C] hover:text-[#0F4C5C] text-[#1A1A1A]/40"
-                            aria-label={`Visit ${project.name}`}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity w-8 h-8 rounded-full border border-black/10 flex items-center justify-center hover:border-[#0F4C5C] hover:text-[#0F4C5C] text-[#1A1A1A]/40"
                         >
-                            <ExternalLink size={13} />
+                            <ArrowUpRight size={13} />
                         </a>
                     )}
                 </div>
 
-                {/* Description */}
                 <p className="text-sm text-[#1A1A1A]/55 leading-relaxed mb-6">
-                    {project.description}
+                    {project.shortDesc}
                 </p>
 
-                {/* Problem / Solution — compact */}
-                <div className="space-y-3 mb-6">
-                    {[
-                        { label: 'Problem', body: project.problem },
-                        { label: 'Solution', body: project.solution },
-                    ].map(({ label, body }) => (
-                        <div key={label} className="flex gap-3">
+                {/* Systems */}
+                <div className="mb-6 space-y-2">
+                    {project.systems.map(({ name, desc }) => (
+                        <div key={name} className="flex gap-3">
                             <span
-                                className="mt-1 flex-shrink-0 w-0.5 rounded-full self-stretch"
-                                style={{ backgroundColor: project.accent + '66' }}
+                                className="mt-1 flex-shrink-0 w-0.5 self-stretch rounded-full"
+                                style={{ backgroundColor: project.accent + '50' }}
                             />
                             <div>
                                 <span className="text-[10px] font-semibold uppercase tracking-widest block mb-0.5"
                                     style={{ color: project.accent }}>
-                                    {label}
+                                    {name}
                                 </span>
-                                <p className="text-xs text-[#1A1A1A]/50 leading-relaxed">{body}</p>
+                                <p className="text-xs text-[#1A1A1A]/50 leading-relaxed">{desc}</p>
                             </div>
                         </div>
                     ))}
                 </div>
 
-                {/* Stack tags */}
-                <div className="flex flex-wrap gap-1.5 mb-7">
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1.5 mb-6">
                     {project.stack.map((tech) => (
                         <Tag key={tech}>{tech}</Tag>
                     ))}
                 </div>
 
-                {/* Links row */}
+                {/* Links */}
                 <div className="flex items-center gap-4 pt-5 border-t border-black/5">
                     {project.links.live && (
                         <a
@@ -103,12 +105,8 @@ function ProjectCard({ project, index }) {
                         </a>
                     )
                     }
-                    {
-                        !project.links.live && !project.links.github && (
-                            <span className="text-xs text-[#1A1A1A]/25 font-medium">Coming soon</span>
-                        )
-                    }
                 </div >
+
             </div >
         </motion.div >
     )
@@ -118,7 +116,6 @@ function Projects() {
     return (
         <section className="py-24 md:py-28 bg-[#F5F7F6]">
             <Container>
-
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
                     <div>
                         <SectionLabel>More Work</SectionLabel>
@@ -127,17 +124,16 @@ function Projects() {
                         </h2>
                     </div>
                     <p className="text-sm text-[#1A1A1A]/40 max-w-xs leading-relaxed">
-                        More projects coming as I build. This portfolio is structured to scale.
+                        More projects coming. The portfolio is structured to scale.
                     </p>
                 </div>
 
-                {/* Project grid — scales as you add more to projects.js */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {secondaryProjects.map((project, i) => (
                         <ProjectCard key={project.id} project={project} index={i} />
                     ))}
 
-                    {/* Placeholder card — remove when you have more projects */}
+                    {/* Placeholder */}
                     <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         whileInView={{ opacity: 1, y: 0 }}
