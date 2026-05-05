@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, Mail, Github, Linkedin, MapPin } from 'lucide-react'
+import { ArrowUpRight, Mail, MapPin } from 'lucide-react'
 import Container from '../layout/Container'
 import SectionLabel from '../ui/SectionLabel'
 import Button from '../ui/Button'
@@ -12,13 +12,13 @@ const links = [
         href: 'mailto:hello@makvion.dev',
     },
     {
-        icon: Github,
+        icon: ArrowUpRight,
         label: 'GitHub',
         value: 'github.com/makvion',
         href: 'https://github.com/makvion',
     },
     {
-        icon: Linkedin,
+        icon: ArrowUpRight,
         label: 'LinkedIn',
         value: 'linkedin.com/in/makvion',
         href: 'https://linkedin.com/in/makvion',
@@ -32,7 +32,7 @@ function Contact() {
 
                 <div className="grid lg:grid-cols-[1fr_400px] gap-16 items-start">
 
-                    {/* ── LEFT: Copy ── */}
+                    {/* LEFT: Copy */}
                     <motion.div
                         initial={{ opacity: 0, y: 24 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -53,22 +53,18 @@ function Contact() {
                             who thinks about the full picture — reach out.
                         </p>
 
-                        <Button
-                            as="a"
-                            href="mailto:hello@makvion.dev"
-                        >
+                        <Button as="a" href="mailto:hello@makvion.dev">
                             Send a Message
                             <ArrowUpRight size={14} />
                         </Button>
 
-                        {/* Location note */}
                         <div className="flex items-center gap-2 mt-8 text-xs text-[#1A1A1A]/35 font-medium">
                             <MapPin size={12} />
                             Based in Lagos, Nigeria — open to remote worldwide
                         </div>
                     </motion.div>
 
-                    {/* ── RIGHT: Contact cards ── */}
+                    {/* RIGHT: Contact cards */}
                     <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
@@ -100,10 +96,7 @@ function Contact() {
                                         <div className="text-sm font-medium text-[#1A1A1A]">{value}</div>
                                     </div>
                                 </div>
-                                <ArrowUpRight
-                                    size={14}
-                                    className="text-[#1A1A1A]/20 group-hover:text-[#0F4C5C] transition-colors duration-200"
-                                />
+                                <ArrowUpRight size={14} className="text-[#1A1A1A]/20 group-hover:text-[#0F4C5C] transition-colors duration-200" />
                             </motion.a>
                         ))}
 
